@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire de Quêtes et Univers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .form-container {
+            width: 60%;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label, select, textarea, input[type="text"], input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        .form-container input[type="submit"] {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .form-container input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .post-it {
+            width: 200px;
+            padding: 15px;
+            margin: 15px;
+            border-radius: 8px;
+            display: inline-block;
+            vertical-align: top;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+
+        .quete { background-color: #ff6b6b; }
+        .parcours { background-color: #4a90e2; }
+        .personnage { background-color: #ff6fcf; }
+        .univers { background-color: #87ceeb; }
+
+        .post-it h2 {
+            margin-top: 0;
+        }
+
+        .post-it p {
+            margin: 5px 0;
+        }
+
+        .category-container {
+            margin-top: 30px;
+        }
+
+        .category-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .post-it-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Gestionnaire de Quêtes, Parcours, Personnages et Univers</h1>
+
+<div class="form-container">
+    <label for="type">Type d'entrée :</label>
+    <select id="type">
+        <option value="quete">Quête</option>
+        <option value="parcours">Parcours</option>
+        <option value="personnage">Personnage</option>
+        <option value="univers">Univers</option>
+    </select>
+
+    <label for="titre">Titre :</label>
+    <input type="text" id="titre" placeholder="Entrez le titre">
+
+    <label for="contenu">Contenu :</label>
+    <textarea id="contenu" placeholder="Entrez le contenu"></textarea>
+
+    <input type="submit" value="Ajouter" onclick="ajouterEntree()">
+</div>
+
+<!-- Conteneur pour afficher les post-its -->
+<div class="category-container">
+    <div class="category-title">Quêtes</div>
+    <div id="queteContainer" class="post-it-container"></div>
+</div>
+
+<div class="category-container">
+    <div class="category-title">Parcours</div>
+    <div id="parcoursContainer" class="post-it-container"></div>
+</div>
+
+<div class="category-container">
+    <div class="category-title">Personnages</div>
+    <div id="personnageContainer" class="post-it-container"></div>
+</div>
+
+<div class="category-container">
+    <div class="category-title">Univers</div>
+    <div id="universContainer" class="post-it-container"></div>
+</div>
+
+<script>
+    // Load all entries on page load
+    window.onload = function() {
+        fetchEntries();
+    };
+
+    // Function to add a new entry
+    function ajouterEntree() {
+        const type = document.getElementById('type').value;
+        const titre = document.getElementById('titre').value;
+        const contenu = document.getElementById('contenu').value;
+
+        if (!type || !titre || !contenu) {
+            alert('Veuillez remplir tous les champs.');
+            return;
+        }
+
+        fetch('http://localhost:3000/api/entries', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type, titre, contenu })
+        })
+        .then(response => response.json())
+        .then(() => {
+            fetchEntries();
+        })
+        .catch(err => console.error('Erreur :', err));
+    }
+
+    // Function to fetch and display all entries
+    function fetchEntries() {
+        fetch('http://localhost:3000/api/entries')
+            .then(response => response.json())
+            .then(data => {
+                const { data: entries } = data;
+
+                // Clear the containers
+                document.getElementById('queteContainer').innerHTML = '';
+                document.getElementById('parcoursContainer').innerHTML = '';
+                document.getElementById('personnageContainer').innerHTML = '';
+                document.getElementById('universContainer').innerHTML = '';
+
+                // Loop through each entry and display them in their respective containers
+                entries.forEach(entry => {
+                    const postIt = document.createElement('div');
+                    postIt.classList.add('post-it', entry.type);
+                    postIt.innerHTML = `<h2>${entry.titre}</h2><p>${entry.contenu}</p>`;
+
+                    // Add a delete button
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Supprimer';
+                    deleteButton.style.marginTop = '10px';
+                    deleteButton.onclick = function() {
+                        deleteEntry(entry.id);
+                    };
+                    postIt.appendChild(deleteButton);
+
+                    // Append to the correct container
+                    switch (entry.type) {
+                        case 'quete':
+                            document.getElementById('queteContainer').appendChild(postIt);
+                            break;
+                        case 'parcours':
+                            document.getElementById('parcoursContainer').appendChild(postIt);
+                            break;
+                        case 'personnage':
+                            document.getElementById('personnageContainer').appendChild(postIt);
+                            break;
+                        case 'univers':
+                            document.getElementById('universContainer').appendChild(postIt);
+                            break;
+                    }
+                });
+            })
+            .catch(err => console.error('Erreur :', err));
+    }
+
+    // Function to delete an entry
+    function deleteEntry(id) {
+        fetch(`http://localhost:3000/api/entries/${id}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(() => {
+                fetchEntries();
+            })
+            .catch(err => console.error('Erreur :', err));
+    }
+</script>
+
+</body>
+</html>
