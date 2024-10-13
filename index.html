@@ -142,7 +142,7 @@
             return;
         }
 
-        fetch('http://localhost:3000/api/entries', {
+        fetch('https://quest-manager.onrender.com/api/entries', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ type, titre, contenu })
@@ -156,7 +156,7 @@
 
     // Function to fetch and display all entries
     function fetchEntries() {
-        fetch('http://localhost:3000/api/entries')
+        fetch('https://quest-manager.onrender.com/api/entries')
             .then(response => response.json())
             .then(data => {
                 const { data: entries } = data;
@@ -204,7 +204,7 @@
 
     // Function to delete an entry
     function deleteEntry(id) {
-        fetch(`http://localhost:3000/api/entries/${id}`, { method: 'DELETE' })
+        fetch(`https://quest-manager.onrender.com/api/entries/${id}`, { method: 'DELETE' })
             .then(response => response.json())
             .then(() => {
                 fetchEntries();
