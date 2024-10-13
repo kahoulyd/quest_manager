@@ -9,16 +9,36 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 20px;
+            padding: 0;
         }
 
         h1 {
             text-align: center;
+            margin-top: 20px;
+        }
+
+        header {
+            background-color: #007BFF;
+            padding: 10px 0;
+            color: white;
+            text-align: center;
+        }
+
+        nav a {
+            margin: 0 15px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
         }
 
         .form-container {
             width: 60%;
-            margin: auto;
+            margin: 20px auto;
             padding: 20px;
             background-color: #fff;
             border-radius: 10px;
@@ -80,64 +100,109 @@
             display: flex;
             flex-wrap: wrap;
         }
+
+        section {
+            display: none;
+            padding: 20px;
+        }
+
+        section.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
 
 <h1>Gestionnaire de Quêtes, Parcours, Personnages et Univers</h1>
 
-<div class="form-container">
-    <label for="type">Type d'entrée :</label>
-    <select id="type">
-        <option value="quete">Quête</option>
-        <option value="parcours">Parcours</option>
-        <option value="personnage">Personnage</option>
-        <option value="univers">Univers</option>
-    </select>
+<!-- Header with navigation -->
+<header>
+    <nav>
+        <a href="#quete" onclick="showSection('queteSection')">Quêtes</a>
+        <a href="#personnage" onclick="showSection('personnageSection')">Personnages</a>
+        <a href="#univers" onclick="showSection('universSection')">Univers</a>
+        <a href="#parcours" onclick="showSection('parcoursSection')">Parcours</a>
+    </nav>
+</header>
 
-    <label for="titre">Titre :</label>
-    <input type="text" id="titre" placeholder="Entrez le titre">
+<!-- Quête Section -->
+<section id="queteSection" class="active">
+    <div class="form-container">
+        <h2>Ajouter une Quête</h2>
+        <label for="titreQuete">Titre :</label>
+        <input type="text" id="titreQuete" placeholder="Entrez le titre">
+        <label for="contenuQuete">Contenu :</label>
+        <textarea id="contenuQuete" placeholder="Entrez le contenu"></textarea>
+        <input type="submit" value="Ajouter" onclick="ajouterEntree('quete')">
+    </div>
+    <div class="category-container">
+        <div class="category-title">Quêtes</div>
+        <div id="queteContainer" class="post-it-container"></div>
+    </div>
+</section>
 
-    <label for="contenu">Contenu :</label>
-    <textarea id="contenu" placeholder="Entrez le contenu"></textarea>
+<!-- Personnage Section -->
+<section id="personnageSection">
+    <div class="form-container">
+        <h2>Ajouter un Personnage</h2>
+        <label for="titrePersonnage">Nom :</label>
+        <input type="text" id="titrePersonnage" placeholder="Entrez le nom">
+        <label for="contenuPersonnage">Description :</label>
+        <textarea id="contenuPersonnage" placeholder="Entrez la description"></textarea>
+        <input type="submit" value="Ajouter" onclick="ajouterEntree('personnage')">
+    </div>
+    <div class="category-container">
+        <div class="category-title">Personnages</div>
+        <div id="personnageContainer" class="post-it-container"></div>
+    </div>
+</section>
 
-    <input type="submit" value="Ajouter" onclick="ajouterEntree()">
-</div>
+<!-- Univers Section -->
+<section id="universSection">
+    <div class="form-container">
+        <h2>Ajouter un Univers</h2>
+        <label for="titreUnivers">Titre :</label>
+        <input type="text" id="titreUnivers" placeholder="Entrez le titre">
+        <label for="contenuUnivers">Description :</label>
+        <textarea id="contenuUnivers" placeholder="Entrez la description"></textarea>
+        <input type="submit" value="Ajouter" onclick="ajouterEntree('univers')">
+    </div>
+    <div class="category-container">
+        <div class="category-title">Univers</div>
+        <div id="universContainer" class="post-it-container"></div>
+    </div>
+</section>
 
-<!-- Conteneur pour afficher les post-its -->
-<div class="category-container">
-    <div class="category-title">Quêtes</div>
-    <div id="queteContainer" class="post-it-container"></div>
-</div>
-
-<div class="category-container">
-    <div class="category-title">Parcours</div>
-    <div id="parcoursContainer" class="post-it-container"></div>
-</div>
-
-<div class="category-container">
-    <div class="category-title">Personnages</div>
-    <div id="personnageContainer" class="post-it-container"></div>
-</div>
-
-<div class="category-container">
-    <div class="category-title">Univers</div>
-    <div id="universContainer" class="post-it-container"></div>
-</div>
+<!-- Parcours Section -->
+<section id="parcoursSection">
+    <div class="form-container">
+        <h2>Ajouter un Parcours</h2>
+        <label for="titreParcours">Titre :</label>
+        <input type="text" id="titreParcours" placeholder="Entrez le titre">
+        <label for="contenuParcours">Contenu :</label>
+        <textarea id="contenuParcours" placeholder="Entrez le contenu"></textarea>
+        <input type="submit" value="Ajouter" onclick="ajouterEntree('parcours')">
+    </div>
+    <div class="category-container">
+        <div class="category-title">Parcours</div>
+        <div id="parcoursContainer" class="post-it-container"></div>
+    </div>
+</section>
 
 <script>
-    // Load all entries on page load
-    window.onload = function() {
-        fetchEntries();
-    };
+    // Function to show a specific section
+    function showSection(sectionId) {
+        const sections = document.querySelectorAll('section');
+        sections.forEach(section => section.classList.remove('active'));
+        document.getElementById(sectionId).classList.add('active');
+    }
 
-    // Function to add a new entry
-    function ajouterEntree() {
-        const type = document.getElementById('type').value;
-        const titre = document.getElementById('titre').value;
-        const contenu = document.getElementById('contenu').value;
+    // Function to add a new entry for each section
+    function ajouterEntree(type) {
+        const titre = document.getElementById(`titre${capitalizeFirstLetter(type)}`).value;
+        const contenu = document.getElementById(`contenu${capitalizeFirstLetter(type)}`).value;
 
-        if (!type || !titre || !contenu) {
+        if (!titre || !contenu) {
             alert('Veuillez remplir tous les champs.');
             return;
         }
@@ -154,7 +219,12 @@
         .catch(err => console.error('Erreur :', err));
     }
 
-    // Function to fetch and display all entries
+    // Capitalize first letter of a string
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    // Fetch and display entries (fetchEntries function as before)
     function fetchEntries() {
         fetch('https://quest-manager.onrender.com/api/entries')
             .then(response => response.json())
